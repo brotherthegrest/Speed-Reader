@@ -1,35 +1,36 @@
-
 package main
 
 import (
-    "fmt"
-    "log"
-    "io"
-    "os"
+	"bufio"
+	"time"
+	"fmt"
+	"os"
+	"log"
 )
 
 func main() {
 	var FileToOpen string
-	fmt.Println("what file would you like to read")
-	fmt.Scan(&FileToOpen)
-	fmt.Println("")
-    f, err := os.Open(FileToOpen)
-    if err != nil {
-        log.Fatalf("unable to read file: %v", err)
-    }
-    defer f.Close()
-    buf := make([]byte, 1024)
-    for {
-        n, err := f.Read(buf)
-	if err == io.EOF {
-		break
-	}
+	var wpm time.Duration
+	fmt.Print("what file would you like to open ? ")
+	fmt.Scanln(&FileToOpen)
+	fmt.Print("at what speed (milliseconds between each word (havent done the math yet for words per minute))")
+	fmt.Scanln(&wpm)
+	file, err := os.Open(FileToOpen)
 	if err != nil {
-		fmt.Println(err)
-		continue
+		log.Fatal(err)
 	}
-	if n > 0 {
-		fmt.Println(string(buf[:n]))
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanWords)
+
+	for scanner.Scan() {
+		fmt.Print(scanner.Text())
+		time.Sleep(wpm * time.Millisecond)
+		fmt.Println("\033c")
 	}
-    }
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
 }
