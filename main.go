@@ -9,7 +9,11 @@ import (
 )
 
 func main() {
-    f, err := os.Open("file.txt")
+	var FileToOpen string
+	fmt.Println("what file would you like to read")
+	fmt.Scan(&FileToOpen)
+	fmt.Println("")
+    f, err := os.Open(FileToOpen)
     if err != nil {
         log.Fatalf("unable to read file: %v", err)
     }
